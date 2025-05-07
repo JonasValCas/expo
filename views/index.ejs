@@ -4,41 +4,96 @@
   <meta charset="UTF-8">
   <title>Sistema de Recomendación de Películas</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
-    h1, h2 { color: #444; }
-    .movie, .rating { border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 8px; }
-    form input, form select, form textarea { display: block; margin: 10px 0; width: 100%; padding: 8px; }
-    form button { padding: 8px 12px; }
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-image: url('https://poptv.orange.es/wp-content/uploads/sites/3/2023/01/blue-monday-peliculas-alegrarte-dia-scaled.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      color: #fff;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background-color: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 30px;
+    }
+    h1, h2 {
+      color: #e50914;
+    }
+    .movie, .rating, .user {
+      border: 1px solid #444;
+      background-color: #222;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+    }
+    form input, form select, form textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    form button {
+      background-color: #e50914;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    form button:hover {
+      background-color: #f40612;
+    }
   </style>
 </head>
 <body>
-  <h1>Películas</h1>
-  <div id="movie-list"></div>
+  <div class="container">
+    <h1>Sistema de Recomendación de Películas</h1>
 
-  <h2>Agregar nueva película</h2>
-  <form id="movie-form">
-    <input type="text" name="title" placeholder="Título" required />
-    <textarea name="description" placeholder="Descripción" required></textarea>
-    <input type="number" name="releaseYear" placeholder="Año de estreno" required />
-    <select name="genre" id="genre-select" required>
-      <option value="">Seleccione un género</option>
-    </select>
-    <button type="submit">Guardar Película</button>
-  </form>
+    <h2>Registro de Usuario</h2>
+    <form id="user-form">
+      <input type="text" name="nombre" placeholder="Nombre" required>
+      <input type="text" name="apellido" placeholder="Apellido" required>
+      <input type="email" name="email" placeholder="Correo electrónico" required>
+      <input type="text" name="telefono" placeholder="Teléfono" required>
+      <button type="submit">Registrar Usuario</button>
+    </form>
 
-  <h2>Calificar una película</h2>
-  <form id="rating-form">
-    <select name="movie" id="movie-select" required>
-      <option value="">Seleccione una película</option>
-    </select>
-    <input type="text" name="user" placeholder="ID de Usuario" required />
-    <input type="number" name="score" placeholder="Puntaje (1-5)" min="1" max="5" required />
-    <textarea name="comment" placeholder="Comentario opcional"></textarea>
-    <button type="submit">Enviar Calificación</button>
-  </form>
+    <h2>Agregar Película</h2>
+    <form id="movie-form">
+      <input type="text" name="title" placeholder="Título" required />
+      <textarea name="description" placeholder="Descripción" required></textarea>
+      <input type="number" name="releaseYear" placeholder="Año de estreno" required />
+      <select name="genre" id="genre-select" required>
+        <option value="">Seleccione un género</option>
+      </select>
+      <button type="submit">Guardar Película</button>
+    </form>
 
-  <h2>Últimas calificaciones</h2>
-  <div id="ratings-list"></div>
+    <h2>Calificar una Película</h2>
+    <form id="rating-form">
+      <select name="movie" id="movie-select" required>
+        <option value="">Seleccione una película</option>
+      </select>
+      <input type="text" name="user" placeholder="ID de Usuario" required />
+      <input type="number" name="score" placeholder="Puntaje (1-5)" min="1" max="5" required />
+      <textarea name="comment" placeholder="Comentario (opcional)"></textarea>
+      <button type="submit">Enviar Calificación</button>
+    </form>
+
+    <h2>Películas</h2>
+    <div id="movie-list"></div>
+
+    <h2>Últimas Calificaciones</h2>
+    <div id="ratings-list"></div>
+  </div>
 
   <script>
     async function fetchGenres() {
@@ -61,9 +116,7 @@
       const movieSelect = document.getElementById('movie-select');
       container.innerHTML = '';
       movieSelect.innerHTML = '<option value="">Seleccione una película</option>';
-
       movies.forEach(movie => {
-        // Mostrar películas
         const div = document.createElement('div');
         div.className = 'movie';
         div.innerHTML = `
@@ -73,8 +126,6 @@
           <p>${movie.description}</p>
         `;
         container.appendChild(div);
-
-        // Agregar al select de calificación
         const option = document.createElement('option');
         option.value = movie._id;
         option.textContent = movie.title;
@@ -105,13 +156,11 @@
       const formData = new FormData(e.target);
       const body = {};
       formData.forEach((v, k) => body[k] = v);
-
       await fetch('/movies', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-
       e.target.reset();
       fetchMovies();
     });
@@ -121,18 +170,30 @@
       const formData = new FormData(e.target);
       const body = {};
       formData.forEach((v, k) => body[k] = v);
-
       await fetch('/ratings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-
       e.target.reset();
       fetchRatings();
     });
 
-    // Inicializa todo
+    document.getElementById('user-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const body = {};
+      formData.forEach((v, k) => body[k] = v);
+      await fetch('/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      alert("Usuario registrado con éxito");
+      e.target.reset();
+    });
+
+    // Cargar datos al iniciar
     fetchGenres();
     fetchMovies();
     fetchRatings();
